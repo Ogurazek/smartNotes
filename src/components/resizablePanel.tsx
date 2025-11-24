@@ -30,10 +30,10 @@ export function NotaResizable() {
 
                         <footer className="flex gap-4 mt-4">
                             <Button className="cursor-pointer">
-                                <Plus /> Nueva Nota
+                                <Plus /> Resumir con IA
                             </Button>
                             <Button className="cursor-pointer">
-                                <Plus /> Nueva Nota
+                                <Plus /> Mejorar con IA
                             </Button>
                         </footer>
                     </div>
