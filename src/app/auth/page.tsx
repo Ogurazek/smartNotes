@@ -16,6 +16,11 @@ export default function AuthPage() {
             const { error } = await supabase.auth.signUp({
                 email,
                 password,
+                options: {
+                    data: {
+                        name: "Nombre del usuario"
+                    }
+                }
             });
 
             setMessage(error ? error.message : "Registro exitoso, revisa tu email");
