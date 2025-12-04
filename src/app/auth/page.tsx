@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { createClientBrowser } from "@/lib/supabase";
 
 export default function AuthPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [mode, setMode] = useState<"login" | "register">("login");
     const [message, setMessage] = useState("");
+
+    const supabase = createClientBrowser();
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();

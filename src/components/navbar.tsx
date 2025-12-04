@@ -21,23 +21,36 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { supabase } from "@/lib/supabase"
+import { createClientBrowser } from "@/lib/supabase"
 import { useEffect, useState } from "react"
 import { User } from "@supabase/supabase-js"
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
+  const supabase = createClientBrowser();
+  const [profile, setProfile] = useState(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then((res) => {
-      setUser(res.data.session?.user ?? null)
-    });
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from("users_profile")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      setProfile(data);
+    }
+
+    load();
   }, []);
 
   console.log("Este es el usuario: ", user)
 
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4 bg-white">
+    <header className="flex h-16 w-full shrink-0 items-center justify-between gap-2 border-b px-4 bg-white">
       <div className="flex items-center gap-2 mr-4">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mr-2 h-4" />
@@ -78,9 +91,9 @@ export default function Navbar() {
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user?.user_metadata.name}</p>
+                <p className="text-sm font-medium leading-none">{profile?.full_name}</p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  {user?.email}
+                  {profile?.email}
                 </p>
               </div>
             </DropdownMenuLabel>
@@ -96,7 +109,7 @@ export default function Navbar() {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Button onClick={async () => {
+              <Button className="cursor-pointer w-full" onClick={async () => {
                 await supabase.auth.signOut();
                 window.location.href = "/auth/login";
               }}>Log out</Button>

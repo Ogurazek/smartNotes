@@ -2,15 +2,19 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { createClientBrowser } from "@/lib/supabase";
 import { redirect } from "next/navigation";
 import { ROUTES } from "@/constant/routes";
+import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const router = useRouter()
+
+    const supabase = createClientBrowser();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -28,7 +32,7 @@ export default function LoginPage() {
 
             console.log("Login con:", email, password);
 
-            redirect(ROUTES.HOME);
+            router.push(ROUTES.HOME)
         } catch (err: any) {
             setError(err.message || "Error iniciando sesión");
         }

@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { createClientBrowser } from "@/lib/supabase";
 import { ROUTES } from "@/constant/routes";
 import { useRouter } from "next/navigation"
 
@@ -13,6 +13,7 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter()
+    const supabase = createClientBrowser();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -20,8 +21,7 @@ export default function LoginPage() {
         setError("");
 
         try {
-
-            const { error } = await supabase.auth.signUp({
+            const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
@@ -33,15 +33,33 @@ export default function LoginPage() {
 
             if (error) throw error;
 
-            console.log("registrado con:", email, password);
+            const user = data.user;
 
-            router.push(ROUTES.HOME)
+            if (!user) {
+                throw new Error("No se pudo obtener el usuario después del registro.");
+            }
+
+            const { error: insertError } = await supabase
+                .from("users_profile")
+                .insert({
+                    id: user.id,
+                    full_name: username,
+                    email: email
+                });
+
+            if (insertError) throw insertError;
+
+            console.log("Usuario y perfil creados correctamente");
+
+            router.push(ROUTES.HOME);
         } catch (err: any) {
+            console.error(err);
             setError(err.message || "Error registrando usuario");
         }
 
         setLoading(false);
     };
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">

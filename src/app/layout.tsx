@@ -24,10 +24,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <title>SmartNotes</title>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <title>SmartNotes</title>
         <div className="flex-1 h-screen">
           {children}
         </div>
