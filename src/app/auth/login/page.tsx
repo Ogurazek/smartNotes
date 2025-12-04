@@ -1,11 +1,11 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClientBrowser } from "@/lib/supabase";
-import { redirect } from "next/navigation";
 import { ROUTES } from "@/constant/routes";
 import { useRouter } from "next/navigation"
+import Link from "next/link";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -15,6 +15,21 @@ export default function LoginPage() {
     const router = useRouter()
 
     const supabase = createClientBrowser();
+
+    useEffect(() => {
+        const checkUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+
+            if (user) {
+                router.replace(ROUTES.HOME)
+            } else {
+                setLoading(false)
+            }
+        }
+
+        checkUser()
+    }, [router, supabase])
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,8 +44,6 @@ export default function LoginPage() {
             });
 
             if (error) throw error;
-
-            console.log("Login con:", email, password);
 
             router.push(ROUTES.HOME)
         } catch (err: any) {
@@ -80,11 +93,12 @@ export default function LoginPage() {
 
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition disabled:opacity-50"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold transition disabled:opacity-50 cursor-pointer"
                         disabled={loading}
                     >
                         {loading ? "Ingresando..." : "Ingresar"}
                     </button>
+                    <p className="text-sm text-center">¿Es la primera vez que estas aquí? <Link href="/auth/register" className="text-blue-600 hover:underline">Crear una cuenta</Link></p>
                 </form>
             </div>
         </div>

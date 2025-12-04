@@ -1,5 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings, } from "lucide-react"
-
+import { NotebookPen } from 'lucide-react';
 import {
     Sidebar,
     SidebarContent,
@@ -14,36 +13,16 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Input } from "./ui/input"
 import Image from "next/image"
+import { createClient } from "@/lib/supabaseSsr";
 
-const items = [
-    {
-        title: "Home",
-        url: "#",
-        icon: Home,
-    },
-    {
-        title: "Inbox",
-        url: "#",
-        icon: Inbox,
-    },
-    {
-        title: "Calendar",
-        url: "#",
-        icon: Calendar,
-    },
-    {
-        title: "Search",
-        url: "#",
-        icon: Search,
-    },
-    {
-        title: "Settings",
-        url: "#",
-        icon: Settings,
-    },
-]
+export async function AppSidebar() {
 
-export function AppSidebar() {
+    const supabase = await createClient();
+
+    const { data: notes, error } = await supabase
+        .from("notes")
+        .select("*")
+
     return (
         <Sidebar>
             <SidebarContent>
@@ -61,15 +40,21 @@ export function AppSidebar() {
                     <SidebarGroupLabel>Tus Notas</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {items.map((item) => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton className="py-6 text-center flex" asChild>
-                                        <a href={item.url}>
-                                            <span className="text-md">{item.title}</span>
-                                        </a>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
+                            {notes && notes.length > 0 ? (
+                                notes.map((item) => (
+                                    <SidebarMenuItem key={item.id}>
+                                        <SidebarMenuButton className="py-6 text-center flex cursor-pointer" asChild>
+                                            <a href={item.url} className='flex justify-between'>
+                                                <span className="text-md">{item.titulo}</span><NotebookPen />
+                                            </a>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                ))
+                            ) : (
+                                <p className="text-sm text-muted-foreground px-4 py-2">
+                                    No hay notas todavía
+                                </p>
+                            )}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>

@@ -1,10 +1,11 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClientBrowser } from "@/lib/supabase";
 import { ROUTES } from "@/constant/routes";
 import { useRouter } from "next/navigation"
+import Link from "next/link";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -14,6 +15,20 @@ export default function LoginPage() {
     const [error, setError] = useState("");
     const router = useRouter()
     const supabase = createClientBrowser();
+
+    useEffect(() => {
+        const checkUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+
+            if (user) {
+                router.replace(ROUTES.HOME)
+            } else {
+                setLoading(false)
+            }
+        }
+
+        checkUser()
+    }, [router, supabase])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -118,6 +133,7 @@ export default function LoginPage() {
                     >
                         {loading ? "Ingresando..." : "Ingresar"}
                     </button>
+                    <p className="text-sm text-center">¿Ya tenes una cuenta? <Link href="/auth/login" className="text-blue-600 hover:underline">Iniciar sesión</Link></p>
                 </form>
             </div>
         </div>
