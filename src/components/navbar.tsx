@@ -47,10 +47,8 @@ export default function Navbar() {
     load();
   }, []);
 
-  console.log("Este es el usuario: ", user)
-
   return (
-    <header className="flex h-16 w-full shrink-0 items-center justify-between gap-2 border-b px-4 bg-white">
+    <header className="flex h-16 w-full shrink-0 items-center justify-between gap-2 px-4 bg-white">
       <div className="flex items-center gap-2 mr-4">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mr-2 h-4" />
@@ -61,7 +59,7 @@ export default function Navbar() {
             </BreadcrumbItem>
             <BreadcrumbSeparator className="hidden md:block" />
             <BreadcrumbItem>
-              <BreadcrumbPage>Inbox</BreadcrumbPage>
+              <BreadcrumbPage></BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

@@ -7,8 +7,9 @@ import {
 } from "@/components/ui/resizable"
 import { Button } from "@/components/ui/button"
 import { Plus, Loader, Save } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { createClientBrowser } from "@/lib/supabase";
+import { useNotesStore } from "@/store/notes-store"
 
 export function NotaResizable() {
     const [titulo, setTitulo] = useState("")
@@ -18,6 +19,16 @@ export function NotaResizable() {
     const [guardando, setGuardando] = useState(false)
 
     const supabase = createClientBrowser();
+
+    const selectedNote = useNotesStore((state) => state.selectedNote)
+
+    useEffect(() => {
+        if (selectedNote) {
+            setTitulo(selectedNote.titulo)
+            setNota(selectedNote.content)
+            setResultadoIA(selectedNote.result_ia || "")
+        }
+    }, [selectedNote])
 
     const usarIA = async (tipo: "resumir" | "mejorar") => {
         if (!nota.trim()) return

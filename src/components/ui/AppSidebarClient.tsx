@@ -1,4 +1,6 @@
-import { NotebookPen } from 'lucide-react';
+"use client"
+
+import { NotebookPen } from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
@@ -8,25 +10,22 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarHeader
+    SidebarHeader,
 } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
-import { Input } from "./ui/input"
+import { Input } from "./input"
 import Image from "next/image"
-import { createClient } from "@/lib/supabaseSsr";
+import { useNotesStore } from "@/store/notes-store"
+import { Button } from "./button"
 
-export async function AppSidebar() {
-
-    const supabase = await createClient();
-
-    const { data: notes, error } = await supabase
-        .from("notes")
-        .select("*")
+export function AppSidebarClient({ notes }: { notes: any[] }) {
+    const setSelectedNote = useNotesStore((state) => state.setSelectedNote)
 
     return (
         <Sidebar>
             <SidebarContent>
-                <SidebarHeader className="font-medium p-4 text-[20px] text-center">
+
+                <SidebarHeader className="font-medium p-3 text-[20px] text-center h-14">
                     <div className="flex gap-2 text-center items-center">
                         <Image src="/icon2.png" alt="SmartNotes Logo" width={42} height={42} />
                         <div className="flex">
@@ -34,19 +33,28 @@ export async function AppSidebar() {
                         </div>
                     </div>
                 </SidebarHeader>
+
                 <Separator />
+
                 <SidebarGroup>
                     <Input className="mb-6" placeholder="Buscar notas..." />
                     <SidebarGroupLabel>Tus Notas</SidebarGroupLabel>
+
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {notes && notes.length > 0 ? (
+
+                            {notes.length > 0 ? (
                                 notes.map((item) => (
                                     <SidebarMenuItem key={item.id}>
-                                        <SidebarMenuButton className="py-6 text-center flex cursor-pointer" asChild>
-                                            <a href={item.url} className='flex justify-between'>
-                                                <span className="text-md">{item.titulo}</span><NotebookPen />
-                                            </a>
+                                        <SidebarMenuButton asChild>
+                                            <Button
+                                                variant="ghost"
+                                                className="w-full flex justify-between py-6 cursor-pointer"
+                                                onClick={() => setSelectedNote(item)}
+                                            >
+                                                <span className="text-md">{item.titulo}</span>
+                                                <NotebookPen color="gray" />
+                                            </Button>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 ))
@@ -55,9 +63,11 @@ export async function AppSidebar() {
                                     No hay notas todavía
                                 </p>
                             )}
+
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
+
             </SidebarContent>
         </Sidebar>
     )
