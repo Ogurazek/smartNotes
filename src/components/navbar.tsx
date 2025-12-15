@@ -24,6 +24,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { createClientBrowser } from "@/lib/supabase"
 import { useEffect, useState } from "react"
 import { User } from "@supabase/supabase-js"
+import { useNotesStore } from "@/store/notes-store"
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
@@ -67,12 +68,15 @@ export default function Navbar() {
 
       <div className="flex items-center gap-4">
         <div className="relative hidden sm:block">
-          <Button variant="ghost" size="icon" className="text-muted-foreground">
+          <Button variant="ghost" size="icon" className="text-muted-foreground"
+          >
             <Search className="h-5 w-5" />
           </Button>
         </div>
 
-        <Button className="cursor-pointer bg-[#3388FC] h-9">
+        <Button className="cursor-pointer bg-[#3388FC] h-9 hover:bg-[#2f7deb] ease-in-out duration-200" onClick={() => {
+          useNotesStore.getState().setSelectedNote(null)
+        }}>
           <Plus className="mr-2 h-4 w-4" />
           Nueva Nota
         </Button>

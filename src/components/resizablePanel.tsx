@@ -10,6 +10,7 @@ import { Plus, Loader, Save } from "lucide-react"
 import { useState, useEffect } from "react"
 import { createClientBrowser } from "@/lib/supabase";
 import { useNotesStore } from "@/store/notes-store"
+import { useRouter } from "next/navigation"
 
 export function NotaResizable() {
     const [titulo, setTitulo] = useState("")
@@ -22,11 +23,17 @@ export function NotaResizable() {
 
     const selectedNote = useNotesStore((state) => state.selectedNote)
 
+    const router = useRouter()
+
     useEffect(() => {
         if (selectedNote) {
             setTitulo(selectedNote.titulo)
             setNota(selectedNote.content)
             setResultadoIA(selectedNote.result_ia || "")
+        } else {
+            setTitulo("")
+            setNota("")
+            setResultadoIA("")
         }
     }, [selectedNote])
 
@@ -65,13 +72,31 @@ export function NotaResizable() {
             return
         }
 
-        const { error } = await supabase.from("notes").insert({
-            user_id: user.id,
-            titulo: titulo,
-            content: nota,
-            result_ia: resultadoIA,
-            type_result: resultadoIA ? "ia" : "manual",
-        })
+        let error = null
+
+        if (selectedNote) {
+            const { error: updateError } = await supabase
+                .from("notes")
+                .update({
+                    titulo: titulo,
+                    content: nota,
+                    result_ia: resultadoIA,
+                    type_result: resultadoIA ? "ia" : "manual",
+                })
+                .eq("id", selectedNote.id)
+
+            error = updateError
+        } else {
+            const { error: insertError } = await supabase.from("notes").insert({
+                user_id: user.id,
+                titulo: titulo,
+                content: nota,
+                result_ia: resultadoIA,
+                type_result: resultadoIA ? "ia" : "manual",
+            })
+
+            error = insertError
+        }
 
         if (error) {
             console.error(error)
@@ -81,6 +106,7 @@ export function NotaResizable() {
             setTitulo("")
             setNota("")
             setResultadoIA("")
+            router.refresh()
         }
 
         setGuardando(false)

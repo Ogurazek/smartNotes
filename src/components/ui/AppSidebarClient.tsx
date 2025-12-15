@@ -17,9 +17,19 @@ import { Input } from "./input"
 import Image from "next/image"
 import { useNotesStore } from "@/store/notes-store"
 import { Button } from "./button"
+import { useState, useMemo } from "react"
 
 export function AppSidebarClient({ notes }: { notes: any[] }) {
     const setSelectedNote = useNotesStore((state) => state.setSelectedNote)
+
+    const [search, setSearch] = useState("")
+
+    const filteredNotes = useMemo(() => {
+        if (!search.trim()) return notes
+        return notes.filter((note) =>
+            note.titulo.toLowerCase().includes(search.toLowerCase())
+        )
+    }, [notes, search])
 
     return (
         <Sidebar>
@@ -37,14 +47,16 @@ export function AppSidebarClient({ notes }: { notes: any[] }) {
                 <Separator />
 
                 <SidebarGroup>
-                    <Input className="mb-6" placeholder="Buscar notas..." />
+                    <Input className="mb-6" placeholder="Buscar notas..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)} />
                     <SidebarGroupLabel>Tus Notas</SidebarGroupLabel>
 
                     <SidebarGroupContent>
                         <SidebarMenu>
 
-                            {notes.length > 0 ? (
-                                notes.map((item) => (
+                            {filteredNotes.length > 0 ? (
+                                filteredNotes.map((item) => (
                                     <SidebarMenuItem key={item.id}>
                                         <SidebarMenuButton asChild>
                                             <Button
@@ -60,7 +72,7 @@ export function AppSidebarClient({ notes }: { notes: any[] }) {
                                 ))
                             ) : (
                                 <p className="text-sm text-muted-foreground px-4 py-2">
-                                    No hay notas todavía
+                                    No hay notas
                                 </p>
                             )}
 

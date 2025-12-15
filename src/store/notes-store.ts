@@ -9,10 +9,12 @@ type Note = {
 
 type NotesStore = {
   selectedNote: Note | null
-  setSelectedNote: (note: Note) => void
+  setSelectedNote: (note: Note | null) => void
+  updateNote: (note: Note) => void
 }
 
 export const useNotesStore = create<NotesStore>((set) => ({
   selectedNote: null,
   setSelectedNote: (note) => set({ selectedNote: note }),
+  updateNote: (note) => set({ selectedNote: note }), 
 }))
